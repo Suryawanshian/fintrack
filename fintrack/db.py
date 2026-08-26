@@ -93,18 +93,49 @@ if __name__ == "__main__":
     insert_default_categories()
 
     # Insert 3 test transactions
-    insert_transaction("2024-01-03",42.50,"Starbucks", "Food", "HDFC", "coffee")
-    insert_transaction("2024-01-04",1200.00,"Amazon", "Shopping", "HDFC", "keyboard")
-    insert_transaction("2024-01-05",350.00, "Zomato", "Food", "HDFC", "dinner")
+    insert_transaction("2024-01-03",42.50,"Starbucks", "Food", "HSBC", "coffee")
+    insert_transaction("2024-01-04",1200.00,"Amazon", "Shopping", "HSBC", "keyboard")
+    insert_transaction("2024-01-05",350.00, "Deliveroo", "Food", "HSBC", "dinner")
 
     #Fetch and print all transactions
     print("\n--- All transactions ---")
     rows = get_all_transactions()
     for row in rows:
-        print(f"{row['date']} | INR{row['amount']} | {row['merchant']} | {row['category']}")
+        print(f"{row['date']} | EUR{row['amount']} | {row['merchant']} | {row['category']}")
 
     #Fetch transactions over 500
-    print("\n--- Transactions over INR500 ---")
+    print("\n--- Transactions over EUR500 ---")
     big = get_transactions_over(500)
     for row in big:
-        print(f"{row['date']} | INR{row['amount']} | {row['merchant']}")
+        print(f"{row['date']} | EUR{row['amount']} | {row['merchant']}")
+
+
+def insert_transactions(df, conn):
+    """
+    Insert a cleaned DataFrame into the transactions table.
+    Uses executemany for speed - inserts all rows in one operation.
+    """
+
+    # Convert DataFrame rows into a list of Tuples
+    # Each tuple is one row to insert
+
+    rows =[
+        (
+            row["date"],
+            row["amount"],
+            row["merchant"],
+            row["category"],
+            row["account"],
+            row["note"]
+        )
+        for row in df.to_dict("records")
+    ]
+
+    sql = """
+            INSERT INTO transactions( date, amount, merchant, category, account, note)
+            VALUES(?,?,?,?,?,?)
+        """
+    conn.executemany(sql, rows)
+    conn.commit()
+    print(f"Inserted {len(rows)} transactions into database")
+    
