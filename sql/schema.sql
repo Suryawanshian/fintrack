@@ -16,3 +16,12 @@ CREATE TABLE IF NOT EXISTS categories (
     name    TEXT UNIQUE NOT NULL,
     budget  REAL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS exchange_rates (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    base TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    rate     REAL NOT NULL,
+    fetched_at TEXT NOT NULL
+);
