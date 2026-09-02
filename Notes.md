@@ -137,3 +137,33 @@ if __name__ == "__main__":
 
     conn.close()
 """
+
+## Day 5 - API Integration
+
+## Environment Variables
+
+Secrets/data stored in .env file - never pushed to GitHub
+.gitignore protects .env automatically
+Read in Python using os.getenv("KEY_NAME")
+load_dotenv() loads .env file into Python
+
+## requests library
+
+Makes HTTP calls to external APIs
+response.status_code == 200 means success
+response.json() converts API response to Python dict
+timeout=10 means give up after 10 seconds
+
+### try/except
+
+Handles errors without crashing the program
+try -> attempt risky operation
+except SpecificError -> handle that specific failure
+Always return {} or None on failure, never crash
+
+## API key security rules
+
+Never hardcore API keys in Python files
+Never commit .env to GitHub
+Always use .env + os.getenv()
+Always create .env example for other developers
