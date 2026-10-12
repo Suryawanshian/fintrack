@@ -51,6 +51,8 @@ calculate results for each group instead for entire table
 A collection of values in round brackets — like a list but fixed.
 (month,)  ← tuple with one item, comma is essential
 (month)   ← NOT a tuple, just brackets
+Tuple items are ordered, unchangeable, and allow duplicate values.
+Tuple items are indexed, the first item has index [0], the second item has index [1] etc.
 
 SQLite needs a tuple as a sealed envelope containing values
 to fill in the ? placeholders in SQL queries.
@@ -142,28 +144,28 @@ if __name__ == "__main__":
 
 ## Environment Variables
 
-Secrets/data stored in .env file - never pushed to GitHub
-.gitignore protects .env automatically
-Read in Python using os.getenv("KEY_NAME")
-load_dotenv() loads .env file into Python
+Secrets/data stored in .env file - never pushed to GitHub.
+.gitignore protects .env automatically.
+Read in Python using os.getenv("KEY_NAME").
+load_dotenv() loads .env file into Python.
 
 ## requests library
 
-Makes HTTP calls to external APIs
-response.status_code == 200 means success
-response.json() converts API response to Python dict
-timeout=10 means give up after 10 seconds
+Makes HTTP calls to external APIs.
+response.status_code == 200 means success.
+response.json() converts API response to Python dict.
+timeout=10 means give up after 10 seconds.
 
 ### try/except
 
-Handles errors without crashing the program
-try -> attempt risky operation
-except SpecificError -> handle that specific failure
+Handles errors without crashing the program.
+try -> attempt risky operation,
+except SpecificError -> handle that specific failure.
 Always return {} or None on failure, never crash
 
 ## API key security rules
 
-Never hardcore API keys in Python files
-Never commit .env to GitHub
+Never hardcore API keys in Python files.
+Never commit .env to GitHub.
 Always use .env + os.getenv()
 Always create .env example for other developers

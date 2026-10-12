@@ -3,7 +3,7 @@ date,amount,merchant,category,account,note
 2024-01-04,120.00,Amazon,Shopping,HSBC,keyboard
 2024-01-05,35.00,Zomato,Food,HSBC,dinner
 2024-01-06,85.00,Uber,Transport,HSBC,airport
-2024-01-07,2200.00,Currys,Shopping,HSBC,headphones
+2024-01-07,220.00,Currys,Shopping,HSBC,headphones
 2024-01-08,55.00,JustEat,Food,Chase,lunch
 2024-01-09,90.00,Ticketmaster,Entertainment,Chase,concert
 2024-01-10,120.00,Freenow,Transport,HSBC,office
@@ -12,7 +12,7 @@ date,amount,merchant,category,account,note
 2024-01-13,200.00,Tesco,Groceries,Chase,weekly groceries
 2024-01-14,75.00,Taxi,Transport,HSBC,bike taxi
 2024-01-15,32.00,Zomato,Food,HSBC,party order
-2024-01-16,1500.00,Apple,Shopping,HSBC,phone
+2024-01-16,150.00,Apple,Shopping,HSBC,accessories
 2024-01-17,300.00,Netflix,Entertainment,Chase,subscription
 2024-01-18,110.00,Uber,Transport,HSBC,ride
 2024-01-19,8.00,Starbucks,Food,Chase,brunch
