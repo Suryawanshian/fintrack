@@ -169,3 +169,28 @@ Never hardcore API keys in Python files.
 Never commit .env to GitHub.
 Always use .env + os.getenv()
 Always create .env example for other developers
+
+
+
+### Rich library
+console = Console() → main printing object
+Table() → creates bordered tables
+Panel() → creates a box around single content
+box.ROUNDED → curved border style
+
+### table.add_column("Name", style="cyan")
+Adds a column header with optional color
+
+### table.add_row("value1", "value2")
+Adds one row — all values must be strings
+Numbers need str() to convert them
+
+### Panel vs Table
+Table → multiple rows of data (list of things)
+Panel → single highlighted summary (one important thing)
+
+### Conditional formatting
+if rate >= 20 → green border
+if rate >= 0  → yellow border
+else          → red border
+Changes visual based on data value
