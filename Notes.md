@@ -9,42 +9,137 @@
 - Delete Database: rm fintrack.db
 - Git Workflow: git add . -> git commit -m "message" -> git push
 
-# Concepts in my words
+## Concept: Virtual Environment (venv)
+    WHAT: It is a virtual environment where all the required project libraries are stored separated from other projects in my computer.
+    WHY:  keeps project libraries separate from other projects
+          Project A needs pandas 1.0 and Project B needs pandas 2.0
+          venv prevents conflict between them
+    WHEN TO USE: every Python project
+    EXAMPLE:  source venv/Scripts/activate
+## Concept: pip + requirements.txt
+    WHAT: pip installs libraries, requirements.txt lists them
+    WHY: anyone can recreate your exact environment
+    WHEN TO USE: after installing any new library
+    EXAMPLE: pip install pandas → pip freeze > requirements.txt
 
-## venv
-It is a virtual environment where all the required project libraries are stored separated from other projects in my computer.
+## Concept: .gitignore
+    WHAT: file that tells Git which files to never track
+    WHY: some files should never go to GitHub
+         venv/ → too large, recreatable
+         .env  → contains secrets
+         *.db  → binary file that changes constantly
+    WHEN TO USE: always, set up before first commit
+    EXAMPLE: .gitignore in FinTrack root folder
 
-## SQLlite
- 
-Database is stored in my computer (fintrack.db)
-To connect to it from python using sqlite3.connect
-SQLite is NOT part of VS Code.
-VS Code is where I write code.
-SQLite is where I store data.
+## Concept: SQLite
+   WHAT: database stored as single file (fintrack.db)
+   WHY: no server needed, perfect for local projects
+        entire database = one file you can copy or delete
+   WHEN TO USE: local apps, prototypes, small projects
+   EXAMPLE: sqlite3.connect("fintrack.db") in db.py
 
-## Git
+## Concept: SQL Schema
+    WHAT: blueprint defining table structure
+    WHY: defines what data can be stored and how
+    WHEN TO USE: before inserting any data
+    EXAMPLE: sql/schema.sql — CREATE TABLE transactions(...)
 
-git add . -> Saves files in a box. It selects/stages files which are to be included in next commit.
-git commit -m "message" -> It labels box
-git push -> ship the box to Github
+## Concept: conn.commit()
+    WHAT: saves changes permanently to database file
+    WHY: without it changes exist only in RAM, lost when program ends
+    WHEN TO USE: after every INSERT, UPDATE, DELETE
+    EXAMPLE: conn.commit() in db.py after executemany()
 
-## DataFrame
+## Concept: Parameterised Queries (?)
+    WHAT: placeholders for values in SQL queries
+    WHY: prevents SQL injection — user input treated as data not code
+    WHEN TO USE: ANY time user input goes into a SQL query
+    EXAMPLE: conn.execute("WHERE month = ?", (month,))
 
-Dataframe- pandas table in RAM
-           temporary(deletes when program ends)
-           used of cleaning data and transforming
-           Unlike SQLite where data is permanently stored
+## Concept: ETL Pipeline
+    WHAT: Extract, Transform, Load — standard data pattern
+    WHY: separates concerns — loading, cleaning, storing are different jobs
+    WHEN TO USE: any time you move data from one place to another
+    EXAMPLE: run_pipeline.py in FinTrack
+         Extract  → load_csv() reads CSV into DataFrame
+         Transform→ clean_transactions() cleans data
+         Load     → insert_transactions() saves to SQLite
 
-## ETL
-ETL:
-Extract   → load CSV into pandas DataFrame
-Transform → clean data (missing values, duplicates, NaN)
-Load      → insert cleaned DataFrame into SQLite (fintrack.db)
+## Concept: df.copy()
+    WHAT: creates separate copy of DataFrame in RAM
+    WHY: cleaning changes don't affect original raw data
+         can always restart cleaning from original
+    WHEN TO USE: always first line of any cleaning function
+    EXAMPLE: df = df.copy() in clean_transactions()
 
-## Group by
+## Concept: pd.to_datetime(errors='coerce')
+    WHAT: converts text dates to real Python date objects
+    WHY: CSV dates are just text, can't do date math on text
+         errors='coerce' turns bad dates to NaN instead of crashing
+    WHEN TO USE: any time you load dates from CSV or API
+    EXAMPLE: df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
-"Group BY splits rows into groups based on column's values, so aggregate functions(max,min,SUM,COUNT,AVG)
-calculate results for each group instead for entire table
+## Concept: pd.to_numeric(errors='coerce')
+    WHAT: converts text numbers to real Python numbers
+    WHY: CSV amounts are text strings, can't do math on them
+         errors='coerce' turns bad values to NaN instead of crashing
+    WHEN TO USE: any time you load numbers from CSV
+    EXAMPLE: df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
+
+## Concept: drop_duplicates()
+    WHAT: removes rows that are identical in specified columns
+    WHY: duplicate transactions would double count spending
+    WHEN TO USE: after loading any external data
+    EXAMPLE: df.drop_duplicates(subset=["date","amount","merchant"])
+
+## Concept: GROUP BY
+    WHAT: groups rows with same value so aggregate functions 
+         calculate per group instead of whole table
+    WHY: need spending per category not total of everything
+    WHEN TO USE: any time you want summary per group
+    EXAMPLE: SELECT category, SUM(amount) FROM transactions 
+         GROUP BY category
+         → gives total per category not overall total
+
+## Concept: Aggregate Functions
+    WHAT: SUM, COUNT, AVG, MAX, MIN — calculate across rows
+    WHY: summarise large amounts of data into useful numbers
+    WHEN TO USE: always with GROUP BY
+    EXAMPLE: SUM(amount) → total spending
+             COUNT(*) → number of transactions
+             AVG(amount) → average transaction size
+
+## Concept: Python Functions
+    WHAT: reusable block of code that does one specific job
+    WHY: write once, use many times, keeps code organised
+    WHEN TO USE: any time you repeat the same logic
+    EXAMPLE: spending_by_category(conn, month) in analyze.py
+             def name(input: type) -> return_type:
+
+
+## Concept: API Integration
+    WHAT: fetching live data from external services over internet
+    WHY: get real-time data (exchange rates, prices) automatically
+    WHEN TO USE: when data changes frequently and needs to be current
+    EXAMPLE: fetch_exchange_rates() in ingest.py
+             requests.get(url) → response.json() → save to DB
+
+
+## Concept: Environment Variables (.env)
+    WHAT: storing secrets outside your code
+    WHY: API keys in code → accidentally pushed to GitHub → security risk
+    WHEN TO USE: any secret value (API keys, passwords, tokens)
+    EXAMPLE: .env file with EXCHANGE_RATE_API_KEY=xxxxx
+             os.getenv("EXCHANGE_RATE_API_KEY") reads it in Python
+
+## Concept: try/except
+    WHAT: handles errors without crashing the program
+    WHY: external services fail — internet goes down, API times out
+        without try/except → one failure crashes everything
+    WHEN TO USE: any risky operation (API calls, file reads, DB queries)
+    EXAMPLE: try: requests.get(url)
+            except ConnectionError: print("no internet") return {}
+
 
 ## Tuple
 
@@ -60,23 +155,6 @@ One ? = one value in the tuple.
 
 ## SQL injection
 SQL injection is to prevent malicious user from inserting unwanted data into the database. ? prevents SQLite from considering any data entered by user as a command treat it as a normal text data
-
-## conn.commit()
-conn.commit() saves changes permanently to disk (fintrack.db)
-Without it → changes exist only in RAM → lost when program ends
-With it    → changes written to fintrack.db → permanent
-
-## df.copy()
-
-It creates a photocopy of your dataframe. So that while data cleaning like stripping whitespaces,removing duplicates, fixing dates they modify the copy not the original as if one realizes while performing data cleaning that cleaning logic is wrong the original df where csv is stored is untouched.
-
-## pd.to_datetime(errors='coerce')
-Converts text dates to real Python date objects.
-errors='coerce' → unreadable dates become NaN instead of crashing.
-
-## pd.to_numeric(errors='coerce')
-Converts text numbers to real Python numbers.
-errors='coerce' → unreadable values become NaN instead of crashing.
 
 ## savings_rate
 (income - total_spent) / income * 100
@@ -140,61 +218,45 @@ if __name__ == "__main__":
     conn.close()
 """
 
-## Day 5 - API Integration
 
-## Environment Variables
+## Day 6 — Rich CLI Dashboard
 
-Secrets/data stored in .env file - never pushed to GitHub.
-.gitignore protects .env automatically.
-Read in Python using os.getenv("KEY_NAME").
-load_dotenv() loads .env file into Python.
+### Concept: Rich Library
+WHAT: Python library that makes terminal output beautiful
+WHY: plain print() is boring and hard to read
+     Rich adds colors, tables, borders automatically
+WHEN TO USE: any CLI tool where you want professional output
+EXAMPLE: fintrack/cli.py — all dashboard output uses Rich
 
-## requests library
+### Concept: Console
+WHAT: main Rich object for printing to terminal
+WHY: replaces basic print() with styled output
+EXAMPLE: console = Console() → console.print(table)
 
-Makes HTTP calls to external APIs.
-response.status_code == 200 means success.
-response.json() converts API response to Python dict.
-timeout=10 means give up after 10 seconds.
+### Concept: Table
+    WHAT: creates formatted table with borders and columns
+    WHY: data in rows/columns is much easier to read than plain text
+    WHEN TO USE: showing lists of data (categories, merchants)
+    EXAMPLE: show_summary() in cli.py
+         table.add_column("Category", style="cyan")
+         table.add_row("Food", "EUR 245.00", "7")
+         All values must be strings — numbers need str()
 
-### try/except
+### Concept: Panel
+    WHAT: puts a box/border around a single piece of content
+    WHY: highlights one important summary number
+    WHEN TO USE: single important result (savings rate, total)
+    EXAMPLE: show_savings() in cli.py
+         Panel(content, title="Financial Summary", border_style="green")
 
-Handles errors without crashing the program.
-try -> attempt risky operation,
-except SpecificError -> handle that specific failure.
-Always return {} or None on failure, never crash
-
-## API key security rules
-
-Never hardcore API keys in Python files.
-Never commit .env to GitHub.
-Always use .env + os.getenv()
-Always create .env example for other developers
-
-
-
-### Rich library
-console = Console() → main printing object
-Table() → creates bordered tables
-Panel() → creates a box around single content
-box.ROUNDED → curved border style
-
-### table.add_column("Name", style="cyan")
-Adds a column header with optional color
-
-### table.add_row("value1", "value2")
-Adds one row — all values must be strings
-Numbers need str() to convert them
-
-### Panel vs Table
-Table → multiple rows of data (list of things)
-Panel → single highlighted summary (one important thing)
-
-### Conditional formatting
-if rate >= 20 → green border
-if rate >= 0  → yellow border
-else          → red border
-Changes visual based on data value
-
+### Concept: Conditional Formatting
+    WHAT: changing visual appearance based on data values
+    WHY: makes good/bad instantly obvious without reading numbers
+    WHEN TO USE: any metric with good/bad threshold
+    EXAMPLE: savings rate color in FinTrack
+         >= 20% → green (healthy)
+         >= 0%  → yellow (ok)
+         < 0%   → red (danger)
 
 
 
