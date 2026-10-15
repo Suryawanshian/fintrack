@@ -194,3 +194,39 @@ if rate >= 20 → green border
 if rate >= 0  → yellow border
 else          → red border
 Changes visual based on data value
+
+
+
+
+## Concept: CTE (Common Table Extension)
+WHAT: temporary named result used inside SQL query using WITH keyword
+WHY:  makes complex queries readable by breaking them into named steps instead of one giant query
+WHEN TO USE: when same calculation needed more than once in a query
+Example: WITH monthly AS('
+    SELECT strftime('%Y-%m',date) AS month,
+            SUM(amount) AS total_spent
+    FROM transactions
+    GROUP BY month
+)
+ → creates temporary "monthly" table
+ → main query then reads from it cleanly
+
+ ## Concept: Window function
+ WHAT: used for calculation across related rows while keeping individual rows visible
+ WHY: when you need individual data and summary in same result
+ WHEN TO USE: 
+    - running totals (cumulative spending over months)
+    - rankings (which category spent most in this month)
+    - comparing each row to group average
+ EXAMPLE: SUM(total_spent) OVER (ORDER BY month) AS running_total
+         shows each month AND cumulative total together
+
+## Concept: Anomaly Detection
+WHAT: automatically finding transactions unusually different from normal
+WHY:  impossible to manually check hundreds of transactions
+WHEN TO USE: 
+    - detect fraud or unsual spending
+    - flag outliers in any dataset
+    - automatic alerts without manual checking
+EXAMPLE: transactions > 2x category average flagged in FinTrack
+         Yamamori EUR 850 = 6.21x Food average → automatically flagged
