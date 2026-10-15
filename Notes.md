@@ -245,3 +245,21 @@ WHY: easier to change design without touching logic
 EXAMPLE: report.html = design, report.py = logic
          change HTML → doesn't affect Python
          change Python → doesn't affect HTML
+
+## Concept: CI/CD (Continuous Integration)
+WHAT: automatically running tests on every code push
+WHY: catches broken code before anyone sees it
+     proves code works publicly with green checkmark
+WHEN TO USE: every real project should have CI
+EXAMPLE: .github/workflows/ci.yml in FinTrack
+         runs pytest automatically on every git push
+    
+## Concept: GitHub Actions
+WHAT: GitHub's built in automation tool
+WHY: free, built into GitHub, no extra setup needed
+HOW IT WORKS:
+  1. You push code
+  2. GitHub creates fresh Linux computer
+  3. Installs Python + dependencies
+  4. Runs pytest
+  5. Shows green ✅ or red ❌
