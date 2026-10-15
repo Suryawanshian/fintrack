@@ -55,7 +55,7 @@ def summarize_clean(df: pd.DataFrame) -> None:
     print(f"Total Transactions: {len(df)}")
     print(f"Date range: {df['date'].min()} to {df['date'].max()}")
     print(f"Total amount: EUR{df['amount'].sum():.2f}")
-    print(f"Categories: {list(df["category"].unique())}")
+    print(f"Categories: {list(df['category'].unique())}")
     print(f"\n Missing values after cleaning:")
     print(df.isnull().sum())
 
