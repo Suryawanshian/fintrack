@@ -77,3 +77,53 @@ SELECT
     ROUND(SUM(amount) / COUNT(DISTINCT DATE), 2) AS daily_average
 FROM transactions
 WHERE strftime("%Y-%m", date) = '2024-01';
+
+
+-- CTE: Monthly spending with running total
+WITH monthly AS (
+    SELECT
+        strftime('%Y-%m', date) AS month,
+        SUM(amount) AS total_spent
+    FROM transactions
+    GROUP BY month
+)
+SELECT 
+    month,
+    total_spent,
+    SUM(total_spent) OVER (ORDER BY month) AS running_total
+FROM monthly
+ORDER BY month;
+
+-- Window function: Rank categories by spending each month
+SELECT
+    strftime('%Y-%m', date) AS month,
+    category,
+    SUM(amount) AS total_spent,
+    RANK() OVER(
+        PARTITION BY strftime('%Y-%m', date)
+        ORDER BY SUM(amount) DESC
+    ) AS spending_rank
+    FROM transactions
+    GROUP BY month, category
+    ORDER BY month, spending_rank;
+
+    -- Anomaly detection: transactions above 2x category average
+    WITH category_stats AS(
+        SELECT
+            category,
+            AVG(amount) AS avg_amount,
+            AVG(amount) * AS threshold
+        FROM transactions
+        GROUP BY category
+    )
+    SELECT
+        t.date,
+        t.amount,
+        t.merchant,
+        t.category,
+        ROUND(cs.avg_amount, 2) AS category_avg,
+        ROUND(t.amount / cs.avg_amount, 2) AS times_above_avg
+    FROM transactions t
+    JOIN category_stats cs ON t.category = cs.category
+    WHERE t.amount > cs.threshold
+    ORDER BY times_above_avg DESC;

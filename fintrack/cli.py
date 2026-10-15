@@ -8,7 +8,8 @@ from fintrack.analyze import(
     top_merchants,
     monthly_totals,
     daily_average,
-    savings_rate
+    savings_rate,
+    detect_anomalies
 
 )
 console = Console()
@@ -123,9 +124,41 @@ def show_savings(month: str, income: float) -> None:
 
      console.print(panel)
 
+def show_anomalies() -> None:
+     """Display unusual transactions."""
 
+     conn = get_connection()
+     anomalies = detect_anomalies(conn)
+     conn.close()
+
+     if not anomalies:
+          console.print("[green]No unusual transactions found.[/green]")
+          return
+
+     table = Table(
+        title="⚠️ Unusual Transactions",
+        box=box.ROUNDED
+    )
+
+     table.add_column("Date", style="cyan")
+     table.add_column("Merchant", style="white")
+     table.add_column("Amount", style="red")
+     table.add_column("Category Avg", style="white")
+     table.add_column("Times Above Avg", style="red")
+
+     for a in anomalies:
+        table.add_row(
+             a["date"],
+             str(a["merchant"]),
+             f"EUR {a['amount']:.2f}",
+             f"EUR {a['category_avg']:.2f}",
+             f"{a['times_above_avg']}x"
+        )
+     console.print(table)
+          
 if __name__== "__main__":
         show_summary("2024-01")
         show_top_merchants(5)
         show_monthly_totals()
         show_savings("2024-01", income=2500.00)
+        show_anomalies()

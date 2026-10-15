@@ -88,6 +88,37 @@ def savings_rate(conn, income: float, month: str) -> float:
     rate = (savings / income) * 100
     return round(rate, 2)
 
+def detect_anomalies(conn) -> list:
+    """
+    Find transactions that are more than 2x 
+    the average for their category.
+    These are unusual spending patterns worth flagging.
+    """
+    sql = """
+        WITH category_stats AS (
+            SELECT
+                category,
+                AVG(amount) AS avg_amount,
+                AVG(amount) * 2 AS threshold
+            FROM transactions
+            GROUP BY category
+        )
+        SELECT
+            t.date,
+            t.amount,
+            t.merchant,
+            t.category,
+            ROUND(cs.avg_amount, 2) AS category_avg,
+            ROUND(t.amount / cs.avg_amount, 2) AS times_above_avg
+        FROM transactions t
+        JOIN category_stats cs ON t.category = cs.category
+        WHERE t.amount > cs.threshold
+        ORDER BY times_above_avg DESC
+    """
+    rows = conn.execute(sql).fetchall()
+    return [dict(row) for row in rows]
+ 
+
 if __name__ == "__main__":
     from fintrack.db import get_connection
 

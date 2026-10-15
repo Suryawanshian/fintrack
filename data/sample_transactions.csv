@@ -19,3 +19,4 @@ date,amount,merchant,category,account,note
 2024-01-20,,JustEat,Food,HSBC,forgot amount
 2024-01-21,250.00,,Transport,HSBC,no merchant name
 2024-01-22,42.50,Starbucks,Food,HSBC,duplicate row
+2024-01-23,850.00,Yamamori ,Food,HSBC,special dinner
