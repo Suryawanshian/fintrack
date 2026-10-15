@@ -230,3 +230,18 @@ WHEN TO USE:
     - automatic alerts without manual checking
 EXAMPLE: transactions > 2x category average flagged in FinTrack
          Yamamori EUR 850 = 6.21x Food average → automatically flagged
+
+## Concept: Jinja2 Templating
+WHAT: fills html template with python data
+WHY: separates data (Python) from presentation (HTML)
+WHEN TO USE: generating HTML reports, emails, any dynamic HTML
+EXAMPLE: report.html template filled by report.py
+         {{ month }} → replaced with "2024-01"
+         {% for cat in categories %} → loops through data
+
+##  Concept: Separation of Concerns
+WHAT: keeping different parts of code separate
+WHY: easier to change design without touching logic
+EXAMPLE: report.html = design, report.py = logic
+         change HTML → doesn't affect Python
+         change Python → doesn't affect HTML
