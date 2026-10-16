@@ -98,6 +98,36 @@
     </tr>
     {% endfor %}
     </table>
+    
+    <!-- Charts -->
+    <h2>Visual Analysis</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+        <div>
+            <img src="{{ pie_chart }}" alt="Category Breakdown" 
+                 style="max-width: 400px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        </div>
+        <div>
+            <img src="{{ bar_chart }}" alt="Monthly Trend" 
+                 style="max-width: 500px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
+    <!-- Top Merchants -->
+    <h2>Top Merchants</h2>
+    <table>
+        <tr>
+            <th>Merchant</th>
+            <th>Total Spent</th>
+            <th>Visits</th>
+        </tr>
+        {% for merchant in merchants %}
+        <tr>
+            <td>{{ merchant.merchant }}</td>
+            <td>EUR {{ "%.2f"|format(merchant.total_spent) }}</td>
+            <td>{{ merchant.num_visits }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <!-- Anomalies -->
      {% if anomalies %}

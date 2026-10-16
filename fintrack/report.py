@@ -8,6 +8,10 @@ from fintrack.analyze import (
     detect_anomalies,
     savings_rate
 )
+from fintrack.charts import generate_category_pie_chart, generate_monthly_bar_chart
+from fintrack.analyze import monthly_totals
+
+
 def generate_report(month: str, income: float) -> str:
      """
     Generate an HTML report for a given month.
@@ -20,6 +24,25 @@ def generate_report(month: str, income: float) -> str:
      anomalies = detect_anomalies(conn)
      rate = savings_rate(conn, income, month)
      conn.close()
+
+     # generate charts
+     charts_dir = "charts"
+     os.makedirs(charts_dir, exist_ok=True)
+    
+     pie_chart_path = generate_category_pie_chart(
+        categories,
+        os.path.join(charts_dir, f"category_pie_{month}.png")
+    )
+    
+    # get monthly data for bar chart
+     conn = get_connection()
+     months_data = monthly_totals(conn)
+     conn.close()
+    
+     bar_chart_path = generate_monthly_bar_chart(
+        months_data,
+        os.path.join(charts_dir, f"monthly_bar_{month}.png")
+    )
 
      # calculate summary numbers
      total_spent = sum(cat["total_spent"] for cat in categories)
@@ -40,7 +63,9 @@ def generate_report(month: str, income: float) -> str:
         categories=categories,
         merchants=merchants,
         anomalies=anomalies,
-        generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        pie_chart=pie_chart_path,
+        bar_chart=bar_chart_path
     )
 
       # Step 4 - save as HTML file
