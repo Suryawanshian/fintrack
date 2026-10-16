@@ -219,7 +219,7 @@ if __name__ == "__main__":
 """
 
 
-## Day 6 — Rich CLI Dashboard
+##  Rich CLI Dashboard
 
 ### Concept: Rich Library
 WHAT: Python library that makes terminal output beautiful
@@ -258,70 +258,102 @@ EXAMPLE: console = Console() → console.print(table)
          >= 0%  → yellow (ok)
          < 0%   → red (danger)
 
+## Concept: pytest (pytest Testing)
+    WHAT: Python testing library
+    WHY: proves your code works, catches bugs automatically
+    WHEN TO USE: every project, every function
+    EXAMPLE: tests/ folder in FinTrack, run with pytest tests/ -v
 
+## Concept: assert
+    WHAT: checks if something is true, fails test if not
+    WHY: verifies function output matches what you expect
+    EXAMPLE: assert len(result) == 3
+             assert result[0]["category"] == "Shopping"
+
+## Concept: Fixtures (@pytest.fixture)
+    WHAT: reusable setup code shared across tests
+    WHY: avoids repeating setup in every test
+    WHEN TO USE: any setup needed by multiple tests
+    EXAMPLE: test_db fixture in conftest.py
+             creates fresh in-memory database for each test
+             yield conn → test runs → conn.close() automatically
+
+## Concept: In-Memory Database (:memory:)
+    WHAT: SQLite database in RAM, not saved to disk
+    WHY: tests shouldn't touch real database
+        fresh database for every test, no leftover data
+    EXAMPLE: sqlite3.connect(":memory:") in conftest.py
+
+## Concept: AAA Pattern
+    WHAT: Arrange, Act, Assert — structure of every test
+    WHY: makes tests readable and consistent
+    EXAMPLE:
+        Arrange → sample_df.loc[3] = [...None...]  (add bad row)
+        Act     → result = clean_transactions(df)  (run function)
+        Assert  → assert len(result) == 3          (check result)
 
 ## Concept: CTE (Common Table Extension)
-WHAT: temporary named result used inside SQL query using WITH keyword
-WHY:  makes complex queries readable by breaking them into named steps instead of one giant query
-WHEN TO USE: when same calculation needed more than once in a query
-Example: WITH monthly AS('
-    SELECT strftime('%Y-%m',date) AS month,
-            SUM(amount) AS total_spent
-    FROM transactions
-    GROUP BY month
+    WHAT: temporary named result used inside SQL query using WITH keyword
+    WHY:  makes complex queries readable by breaking them into named steps instead of one giant query
+    WHEN TO USE: when same calculation needed more than once in a query
+    Example: WITH monthly AS('
+        SELECT strftime('%Y-%m',date) AS month,
+                SUM(amount) AS total_spent
+        FROM transactions
+        GROUP BY month
 )
  → creates temporary "monthly" table
  → main query then reads from it cleanly
 
  ## Concept: Window function
- WHAT: used for calculation across related rows while keeping individual rows visible
- WHY: when you need individual data and summary in same result
- WHEN TO USE: 
-    - running totals (cumulative spending over months)
-    - rankings (which category spent most in this month)
-    - comparing each row to group average
- EXAMPLE: SUM(total_spent) OVER (ORDER BY month) AS running_total
-         shows each month AND cumulative total together
+    WHAT: used for calculation across related rows while keeping individual rows visible
+    WHY: when you need individual data and summary in same result
+    WHEN TO USE: 
+        - running totals (cumulative spending over months)
+        - rankings (which category spent most in this month)
+        - comparing each row to group average
+    EXAMPLE: SUM(total_spent) OVER (ORDER BY month) AS running_total
+            shows each month AND cumulative total together
 
 ## Concept: Anomaly Detection
-WHAT: automatically finding transactions unusually different from normal
-WHY:  impossible to manually check hundreds of transactions
-WHEN TO USE: 
-    - detect fraud or unsual spending
-    - flag outliers in any dataset
-    - automatic alerts without manual checking
-EXAMPLE: transactions > 2x category average flagged in FinTrack
-         Yamamori EUR 850 = 6.21x Food average → automatically flagged
+    WHAT: automatically finding transactions unusually different from normal
+    WHY:  impossible to manually check hundreds of transactions
+    WHEN TO USE: 
+        - detect fraud or unsual spending
+        - flag outliers in any dataset
+        - automatic alerts without manual checking
+    EXAMPLE: transactions > 2x category average flagged in FinTrack
+            Yamamori EUR 850 = 6.21x Food average → automatically flagged
 
 ## Concept: Jinja2 Templating
-WHAT: fills html template with python data
-WHY: separates data (Python) from presentation (HTML)
-WHEN TO USE: generating HTML reports, emails, any dynamic HTML
-EXAMPLE: report.html template filled by report.py
-         {{ month }} → replaced with "2024-01"
-         {% for cat in categories %} → loops through data
+    WHAT: fills html template with python data
+    WHY: separates data (Python) from presentation (HTML)
+    WHEN TO USE: generating HTML reports, emails, any dynamic HTML
+    EXAMPLE: report.html template filled by report.py
+            {{ month }} → replaced with "2024-01"
+            {% for cat in categories %} → loops through data
 
 ##  Concept: Separation of Concerns
-WHAT: keeping different parts of code separate
-WHY: easier to change design without touching logic
-EXAMPLE: report.html = design, report.py = logic
-         change HTML → doesn't affect Python
-         change Python → doesn't affect HTML
+    WHAT: keeping different parts of code separate
+    WHY: easier to change design without touching logic
+    EXAMPLE: report.html = design, report.py = logic
+            change HTML → doesn't affect Python
+            change Python → doesn't affect HTML
 
 ## Concept: CI/CD (Continuous Integration)
-WHAT: automatically running tests on every code push
-WHY: catches broken code before anyone sees it
-     proves code works publicly with green checkmark
-WHEN TO USE: every real project should have CI
-EXAMPLE: .github/workflows/ci.yml in FinTrack
-         runs pytest automatically on every git push
+    WHAT: automatically running tests on every code push
+    WHY: catches broken code before anyone sees it
+        proves code works publicly with green checkmark
+    WHEN TO USE: every real project should have CI
+    EXAMPLE: .github/workflows/ci.yml in FinTrack
+            runs pytest automatically on every git push
     
 ## Concept: GitHub Actions
-WHAT: GitHub's built in automation tool
-WHY: free, built into GitHub, no extra setup needed
-HOW IT WORKS:
-  1. You push code
-  2. GitHub creates fresh Linux computer
-  3. Installs Python + dependencies
-  4. Runs pytest
-  5. Shows green ✅ or red ❌
+    WHAT: GitHub's built in automation tool
+    WHY: free, built into GitHub, no extra setup needed
+    HOW IT WORKS:
+    1. You push code
+    2. GitHub creates fresh Linux computer
+    3. Installs Python + dependencies
+    4. Runs pytest
+    5. Shows green ✅ or red ❌
