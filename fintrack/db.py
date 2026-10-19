@@ -73,11 +73,11 @@ def get_transactions_over(amount):
 def insert_default_categories(conn=None):
     """Insert default spending categories with budgets."""
     categories = [
-        ("Food", 4000),
-        ("Transport",2000),
-        ("Shopping", 5000),
-        ("Entertainment",2000),
-        ("Groceries",3000),
+        ("Food", 300),
+        ("Transport",150),
+        ("Shopping", 200),
+        ("Entertainment",100),
+        ("Groceries", 200),
         ("Uncategorized", 0),
 
     ]

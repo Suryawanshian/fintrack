@@ -127,3 +127,21 @@ SELECT
     JOIN category_stats cs ON t.category = cs.category
     WHERE t.amount > cs.threshold
     ORDER BY times_above_avg DESC;
+
+
+    -- Budget vs Actual Spending
+
+    SELECT 
+        c.name AS category,
+        c.budget,
+        COALESCE(SUM(t.amount), 0) AS total_spent,
+        c.budget - COALESCE(SUM(t.amount), 0) AS remaining,
+        ROUND(COALESCE(SUM(t.amount), 0) c.budget * 100, 1) AS pct_used
+        FROM categories c
+        LEFT JOIN transactions t
+             ON c.name = t.category
+             AND strftime('%Y-%m', t.date) = '2024-01'
+        WHERE c.budget > 0
+        GROUP BY c.name
+        ORDER BY pct_used DESC;
+        

@@ -117,7 +117,32 @@ def detect_anomalies(conn) -> list:
     """
     rows = conn.execute(sql).fetchall()
     return [dict(row) for row in rows]
- 
+
+def budget_vs_actual (conn, month:str) -> list:
+     """
+    Compare actual spending against budget for each category.
+    Returns list of dicts with budget, spent, remaining, pct_used.
+    """
+
+     sql = """
+        SELECT
+            c.name AS category,
+            c.budget,
+            COALESCE(SUM(t.amount), 0) AS total_spent,
+            c.budget - COALESCE(SUM(t.amount), 0) AS remaining,
+            ROUND(COALESCE(SUM(t.amount), 0) / c.budget * 100, 1) AS pct_used
+        FROM categories c
+        LEFT JOIN transactions t
+            ON c.name = t.category
+            AND strftime('%Y-%m', t.date) = ?
+        WHERE c.budget > 0
+        GROUP BY c.name
+        ORDER BY pct_used DESC    
+        """ 
+
+     rows = conn.execute(sql, (month, )).fetchall()
+     return [dict(row) for row in rows]
+
 
 if __name__ == "__main__":
     from fintrack.db import get_connection

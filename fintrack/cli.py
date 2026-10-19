@@ -9,7 +9,8 @@ from fintrack.analyze import(
     monthly_totals,
     daily_average,
     savings_rate,
-    detect_anomalies
+    detect_anomalies,
+    budget_vs_actual
 
 )
 console = Console()
@@ -155,10 +156,50 @@ def show_anomalies() -> None:
              f"{a['times_above_avg']}x"
         )
      console.print(table)
-          
+
+def show_budget(month: str) -> None:
+     """Display budget vs actual spending for each category."""
+
+     conn = get_connection()
+     budget_data = budget_vs_actual(conn, month)
+     conn.close()
+
+     table = Table(
+        title=f"Budget vs Actual — {month}",
+        box=box.ROUNDED
+     )
+
+     table.add_column("Category", style="cyan")
+     table.add_column("Budget", style="white")
+     table.add_column("Spent", style="white")
+     table.add_column("Remaining", style="white")
+     table.add_column("% Used", style="white")
+
+     for item in budget_data:
+          remaining = item["remaining"]
+          pct = item["pct_used"] 
+
+          if pct > 100:
+             status_color = "red"
+          elif pct > 80:
+               status_color = "yellow"
+          else:
+               status_color = "green" 
+
+          table.add_row(
+            item["category"],
+            f"EUR {item['budget']:.2f}",
+            f"EUR {item['total_spent']:.2f}",
+            f"[{status_color}]EUR {remaining:.2f}[/{status_color}]",
+            f"[{status_color}]{pct}%[/{status_color}]"
+        )
+
+     console.print(table
+                   )         
 if __name__== "__main__":
         show_summary("2024-01")
         show_top_merchants(5)
         show_monthly_totals()
         show_savings("2024-01", income=2500.00)
         show_anomalies()
+        show_budget("2024-01")
