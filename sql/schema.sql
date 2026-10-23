@@ -25,3 +25,16 @@ CREATE TABLE IF NOT EXISTS exchange_rates (
     rate     REAL NOT NULL,
     fetched_at TEXT NOT NULL
 );
+
+-- Indexes for query performance
+
+CREATE INDEX IF NOT EXISTS idx_transactions_date    
+        ON transactions(date);
+
+
+CREATE INDEX IF NOT EXISTS idx_transactions_category
+        ON transactions(category);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_date_category
+        ON transactions(date, category);
+        
