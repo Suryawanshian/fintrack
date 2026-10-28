@@ -356,6 +356,23 @@ EXAMPLE: console = Console() → console.print(table)
     FROM transactions
     GROUP BY category
     HAVING SUM(amount) > 100
-   -only shows categories where total spending exceeds 100                
+   -only shows categories where total spending exceeds 100 
 
+## SQL: SUBQUERY
 
+    WHAT: a query inside another query
+    WHY: when you need a calculated value to filter by we can't use AVG() directly in WHERE clause
+
+    SYNTAX: 
+    SELECT merchant, amount
+    FROM transactions
+    WHERE amount > (SELECT AVG(amount) FROM transactions)
+
+    HOW IT RUNS:
+1. Inner query runs first → returns one number (85.17)
+2. Outer query uses that number → WHERE amount > 85.17
+
+    WHEN TO USE:
+    When you need to compare rows against a calculated value
+    Example: find transactions above average
+    Example: find categories above average budget usage 
