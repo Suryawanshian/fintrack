@@ -16,6 +16,7 @@
           venv prevents conflict between them
     WHEN TO USE: every Python project
     EXAMPLE:  source venv/Scripts/activate
+
 ## Concept: pip + requirements.txt
     WHAT: pip installs libraries, requirements.txt lists them
     WHY: anyone can recreate your exact environment
@@ -161,64 +162,6 @@ SQL injection is to prevent malicious user from inserting unwanted data into the
 Negative means you spent more than you earned that month.
 
 
-"""
-    def save_exchange_rates(rates: dict, base: str, conn)-> None:
-        """
-        Save fetched exchange rates to database
-        """
-
-        if not rates:
-            print("No rates to save")
-            return
-
-        # Get Current timestamp
-
-        fetched_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # Prepare rows for insertion
-
-        rows = [
-            (base, currency, rate, fetched_at)
-            for currency, rate in rates.items()
-        ]
-
-        conn.executemany(
-            "INSERT INTO exchange_rates (base, currency, rate, fetched_at) VALUES (?, ?, ?, ?)",
-            rows
-        )
-
-        conn.commit()
-        print(f"Saved {len(rows)} exchange rates to database")
-
-if __name__ == "__main__":
-
-    #existing code
-
-    df = load_csv("data/sample_transactions.csv")
-    summarize(df)
-
-    # New - test API
-
-    from fintrack.db import get_connection, create_tables
-
-    conn = get_connection()
-    create_tables()
-
-    rates = fetch_exchange_rates(base="EUR")
-
-    if rates:
-        print(f"\n Sample rates:")
-        print(f"1 EUR = {rates.get('USD', 'N/A',)} USD")
-        print(f"1 EUR = {rates.get('GBP', 'N/A',)} GBP")
-        print(f"1 EUR = {rates.get('INR', 'N/A',)} INR")
-
-        save_exchange_rates(rates, "EUR", conn)
-
-
-    conn.close()
-"""
-
-
 ##  Rich CLI Dashboard
 
 ### Concept: Rich Library
@@ -357,3 +300,62 @@ EXAMPLE: console = Console() → console.print(table)
     3. Installs Python + dependencies
     4. Runs pytest
     5. Shows green ✅ or red ❌
+
+
+
+## Concept: Database Indexes
+    WHAT: data structure that speeds up database queries
+    WHY : without index SQLite scans every row
+          with index SQLite goes directly to matching rows
+          20 rows → no difference, both fast
+          10,000 rows → small difference
+          1,000,000 rows → index is 100x faster, no index = unusable
+    WHEN TO USE: Add an index on any column you frequently search by.
+                In FinTrack: date and category are searched in every query.
+    HOW TO CREATE: CREATE INDEX idx_date ON transactions(date);
+                    - now WHERE date = '2024-01-03' is instant
+    IMPORTANT GOTCHA I LEARNED: strftime('%Y-%m', date) breaks the index.
+                    SQLite can't use the date index when you transform the date first.
+                    The index stores '2024-01-03' but you're searching for '2024-01'.
+                    They don't match → index ignored → full table scan.
+    
+## Concept: Composite Index
+    WHAT: An Index on two columns combined
+          Like a phone book sorted by last name and first name.
+    
+    Example from FINTRACK: CREATE INDEX idx_date_cat ON transactions(date, category);
+            - speeds up: WHERE date = ? GROUP BY category
+            - both conditions use one index instead of two
+
+## Concept: Benchmark
+    WHAT: Measuring exactly how fast your code runs with real numbers.
+
+
+## SQL : WHERE vs HAVING
+
+    WHERE: filters individual rows before BEFORE grouping
+    HAVING: filters rows AFTER grouping
+
+    USE WHERE for regular columns:
+    WHERE amount > 100 - only rows where amount more than 100
+
+    USE HAVING for SUM/COUNT/AVG:
+    HAVING SUM(amount) > 100 - only groups where total is more than 100
+
+    ORDER of clauses:
+
+    SELECT
+    FROM
+    WHERE
+    GROUP BY
+    HAVING
+    ORDER BY
+
+    EXAMPLE FROM DRILL:
+    SELECT category, SUM(amount) AS total_spent
+    FROM transactions
+    GROUP BY category
+    HAVING SUM(amount) > 100
+   -only shows categories where total spending exceeds 100                
+
+
